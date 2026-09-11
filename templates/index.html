@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Emergency SOS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f5f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 38px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 35px;
+        }
+
+        .sos-button {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: none;
+            background: #e53935;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(229, 57, 53, 0.35);
+        }
+
+        .sos-button:hover {
+            transform: scale(1.05);
+        }
+
+        .info {
+            margin-top: 35px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 200px;
+            padding: 20px;
+            background: #f8f9fc;
+            border-radius: 12px;
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🚨 Smart Emergency SOS</h1>
+
+        <p class="subtitle">
+            Quick assistance when you need it most
+        </p>
+
+        <button class="sos-button" onclick="sendSOS()">
+            SOS
+        </button>
+
+        <div id="location" style="margin-top: 25px;"></div>
+
+        <div class="info">
+
+            <div class="card">
+                <h3>📍 Location</h3>
+                <p>Share your current location during an emergency.</p>
+            </div>
+
+            <div class="card">
+                <h3>👥 Contacts</h3>
+                <p>Notify your selected emergency contacts.</p>
+            </div>
+
+            <div class="card">
+                <h3>📝 History</h3>
+                <p>Keep track of previous emergency requests.</p>
+            </div>
+
+        </div>
+
+    </div>
+    <div style="margin-top: 35px; padding: 25px; background: #f8f9fc; border-radius: 15px;">
+
+        <h2>👥 Emergency Contacts</h2>
+
+        <p style="color: #666; margin: 10px 0 20px;">
+            Add a trusted person to contact during an emergency.
+        </p>
+
+        <input type="text" id="contactName" placeholder="Enter contact name"
+            style="padding: 12px; width: 80%; margin: 5px; border: 1px solid #ccc; border-radius: 8px;">
+
+        <br>
+
+        <input type="tel" id="contactPhone" placeholder="Enter phone number"
+            style="padding: 12px; width: 80%; margin: 5px; border: 1px solid #ccc; border-radius: 8px;">
+
+        <br>
+
+        <button onclick="addContact()"
+            style="padding: 12px 25px; margin-top: 10px; border: none; border-radius: 8px; background: #333; color: white; cursor: pointer;">
+            + Add Contact
+        </button>
+
+        <div id="contactsList" style="margin-top: 20px;"></div>
+
+    </div>
+    <script>
+        function sendSOS() {
+            const locationBox = document.getElementById("location");
+
+            if (!navigator.geolocation) {
+                locationBox.innerHTML = "❌ Location is not supported by this browser.";
+                return;
+            }
+
+            locationBox.innerHTML = "📍 Getting your location...";
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    locationBox.innerHTML = `
+                <h3>📍 Current Location</h3>
+                <p>Latitude: ${latitude}</p>
+                <p>Longitude: ${longitude}</p>
+
+                <a href="https://www.google.com/maps?q=${latitude},${longitude}"
+                   target="_blank">
+                    🗺️ Open in Google Maps
+                </a>
+            `;
+                },
+                function () {
+                    locationBox.innerHTML =
+                        "❌ Location permission was not granted.";
+                }
+            );
+        }
+        function addContact() {
+            const name = document.getElementById("contactName").value;
+            const phone = document.getElementById("contactPhone").value;
+            const list = document.getElementById("contactsList");
+
+            if (name === "" || phone === "") {
+                alert("Please enter both name and phone number.");
+                return;
+            }
+
+            const contact = document.createElement("div");
+
+            contact.style.marginTop = "10px";
+            contact.style.padding = "15px";
+            contact.style.background = "white";
+            contact.style.borderRadius = "10px";
+
+            contact.innerHTML = `
+        <strong>👤 ${name}</strong><br>
+        📞 ${phone}
+    `;
+
+            list.appendChild(contact);
+
+            document.getElementById("contactName").value = "";
+            document.getElementById("contactPhone").value = "";
+        }
+    </script>
+
+</body>
+
+</html>
