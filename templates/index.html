@@ -21,6 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 30px;
         }
 
         .container {
@@ -84,6 +85,45 @@
             color: #666;
             font-size: 14px;
         }
+
+        .section {
+            margin-top: 35px;
+            padding: 25px;
+            background: #f8f9fc;
+            border-radius: 15px;
+        }
+
+        .input-box {
+            padding: 12px;
+            width: 80%;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .add-button {
+            padding: 12px 25px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        .contact-box,
+        .history-box {
+            margin-top: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .history-box a {
+            color: #1976d2;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -122,128 +162,350 @@
 
         </div>
 
+        <!-- Emergency Contacts -->
+
+        <div class="section">
+
+            <h2>👥 Emergency Contacts</h2>
+
+            <p style="color: #666; margin: 10px 0 20px;">
+                Add a trusted person to contact during an emergency.
+            </p>
+
+            <input type="text" id="contactName" placeholder="Enter contact name" class="input-box">
+
+            <br>
+
+            <input type="tel" id="contactPhone" placeholder="Enter phone number" class="input-box">
+
+            <br>
+
+            <button onclick="addContact()" class="add-button">
+                + Add Contact
+            </button>
+
+            <div id="contactsList" style="margin-top: 20px;"></div>
+
+        </div>
+
+        <!-- Emergency History -->
+
+        <div class="section">
+
+            <h2>📝 Emergency History</h2>
+
+            <p style="color: #666; margin: 10px 0 20px;">
+                Previous SOS requests
+            </p>
+
+            <div id="historyList"></div>
+
+        </div>
+
     </div>
-    <div style="margin-top: 35px; padding: 25px; background: #f8f9fc; border-radius: 15px;">
 
-        <h2>👥 Emergency Contacts</h2>
-
-        <p style="color: #666; margin: 10px 0 20px;">
-            Add a trusted person to contact during an emergency.
-        </p>
-
-        <input type="text" id="contactName" placeholder="Enter contact name"
-            style="padding: 12px; width: 80%; margin: 5px; border: 1px solid #ccc; border-radius: 8px;">
-
-        <br>
-
-        <input type="tel" id="contactPhone" placeholder="Enter phone number"
-            style="padding: 12px; width: 80%; margin: 5px; border: 1px solid #ccc; border-radius: 8px;">
-
-        <br>
-
-        <button onclick="addContact()"
-            style="padding: 12px 25px; margin-top: 10px; border: none; border-radius: 8px; background: #333; color: white; cursor: pointer;">
-            + Add Contact
-        </button>
-
-        <div id="contactsList" style="margin-top: 20px;"></div>
-
-    </div>
     <script>
+
+        // =========================
+        // SOS FUNCTION
+        // =========================
+
         function sendSOS() {
+
             const locationBox = document.getElementById("location");
 
             if (!navigator.geolocation) {
-                locationBox.innerHTML = "❌ Location is not supported by this browser.";
+
+                locationBox.innerHTML =
+                    "❌ Location is not supported by this browser.";
+
                 return;
             }
 
-            locationBox.innerHTML = "📍 Getting your location...";
+            locationBox.innerHTML =
+                "📍 Getting your location...";
 
             navigator.geolocation.getCurrentPosition(
+
                 function (position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
+
+                    const latitude =
+                        position.coords.latitude;
+
+                    const longitude =
+                        position.coords.longitude;
+
+                    // Display location
 
                     locationBox.innerHTML = `
-                <h3>📍 Current Location</h3>
-                <p>Latitude: ${latitude}</p>
-                <p>Longitude: ${longitude}</p>
+                        <h3>📍 Current Location</h3>
+                        <p>Latitude: ${latitude}</p>
+                        <p>Longitude: ${longitude}</p>
 
-                <a href="https://www.google.com/maps?q=${latitude},${longitude}"
-                   target="_blank">
-                    🗺️ Open in Google Maps
-                </a>
-            `;
+                        <a href="https://www.google.com/maps?q=${latitude},${longitude}"
+                           target="_blank">
+                            🗺️ Open in Google Maps
+                        </a>
+                    `;
+
+                    // Save SOS history
+
+                    fetch("/save_history", {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            event: "SOS Activated",
+
+                            location:
+                                latitude + "," + longitude
+                        })
+
+                    })
+
+                        .then(response => response.json())
+
+                        .then(data => {
+
+                            console.log(data.message);
+
+                            // Refresh history immediately
+
+                            loadHistory();
+
+                        })
+
+                        .catch(error => {
+
+                            console.error(
+                                "History error:",
+                                error
+                            );
+
+                        });
+
                 },
+
                 function () {
+
                     locationBox.innerHTML =
                         "❌ Location permission was not granted.";
+
                 }
             );
         }
+
+
+        // =========================
+        // ADD CONTACT
+        // =========================
+
         function addContact() {
-            const name = document.getElementById("contactName").value.trim();
-            const phone = document.getElementById("contactPhone").value.trim();
+
+            const name =
+                document.getElementById("contactName")
+                    .value.trim();
+
+            const phone =
+                document.getElementById("contactPhone")
+                    .value.trim();
 
             if (name === "" || phone === "") {
-                alert("Please enter both name and phone number.");
+
+                alert(
+                    "Please enter both name and phone number."
+                );
+
                 return;
             }
 
             fetch("/add_contact", {
+
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
+
                     name: name,
                     phone: phone
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("Contact saved successfully! ✅");
 
-                        document.getElementById("contactName").value = "";
-                        document.getElementById("contactPhone").value = "";
-                    } else {
-                        alert(data.message);
-                    }
                 })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    if (data.success) {
+
+                        alert(
+                            "Contact saved successfully! ✅"
+                        );
+
+                        document.getElementById(
+                            "contactName"
+                        ).value = "";
+
+                        document.getElementById(
+                            "contactPhone"
+                        ).value = "";
+
+                        loadContacts();
+
+                    } else {
+
+                        alert(data.message);
+
+                    }
+
+                })
+
                 .catch(error => {
+
                     console.error(error);
-                    alert("Something went wrong.");
+
+                    alert(
+                        "Something went wrong."
+                    );
+
                 });
         }
+
+
+        // =========================
+        // LOAD CONTACTS
+        // =========================
+
         function loadContacts() {
+
             fetch("/contacts")
+
                 .then(response => response.json())
+
                 .then(contacts => {
-                    const list = document.getElementById("contactsList");
+
+                    const list =
+                        document.getElementById(
+                            "contactsList"
+                        );
 
                     list.innerHTML = "";
 
-                    contacts.forEach(contact => {
-                        const contactBox = document.createElement("div");
+                    if (contacts.length === 0) {
 
-                        contactBox.style.marginTop = "10px";
-                        contactBox.style.padding = "15px";
-                        contactBox.style.background = "white";
-                        contactBox.style.borderRadius = "10px";
+                        list.innerHTML =
+                            "<p>No emergency contacts added yet.</p>";
+
+                        return;
+                    }
+
+                    contacts.forEach(contact => {
+
+                        const contactBox =
+                            document.createElement("div");
+
+                        contactBox.className =
+                            "contact-box";
 
                         contactBox.innerHTML = `
-                    <strong>👤 ${contact.name}</strong><br>
-                    📞 ${contact.phone}
-                `;
+                            <strong>👤 ${contact.name}</strong>
+                            <br>
+                            📞 ${contact.phone}
+                        `;
 
-                        list.appendChild(contactBox);
+                        list.appendChild(
+                            contactBox
+                        );
+
                     });
+
                 });
         }
 
-        window.onload = loadContacts;
+
+        // =========================
+        // LOAD EMERGENCY HISTORY
+        // =========================
+
+        function loadHistory() {
+
+            fetch("/history")
+
+                .then(response => response.json())
+
+                .then(records => {
+
+                    const list =
+                        document.getElementById(
+                            "historyList"
+                        );
+
+                    list.innerHTML = "";
+
+                    if (records.length === 0) {
+
+                        list.innerHTML =
+                            "<p>No emergency history yet.</p>";
+
+                        return;
+                    }
+
+                    records.forEach(record => {
+
+                        const historyBox =
+                            document.createElement("div");
+
+                        historyBox.className =
+                            "history-box";
+
+                        historyBox.innerHTML = `
+                            <strong>🚨 ${record.event}</strong>
+                            <br>
+                            📍 ${record.location}
+                            <br>
+                            🕐 ${record.created_at}
+                        `;
+
+                        list.appendChild(
+                            historyBox
+                        );
+
+                    });
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "History loading error:",
+                        error
+                    );
+
+                });
+        }
+
+
+        // =========================
+        // PAGE LOAD
+        // =========================
+
+        window.onload = function () {
+
+            loadContacts();
+
+            loadHistory();
+
+        };
+
     </script>
 
 </body>

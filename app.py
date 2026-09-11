@@ -15,11 +15,22 @@ def get_db():
 def init_db():
     conn = get_db()
 
+    # Emergency contacts table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             phone TEXT NOT NULL
+        )
+    """)
+
+    # Emergency history table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS emergency_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event TEXT NOT NULL,
+            location TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -40,7 +51,10 @@ def add_contact():
     phone = data.get("phone", "").strip()
 
     if not name or not phone:
-        return jsonify({"success": False, "message": "Name and phone are required."})
+        return jsonify({
+            "success": False,
+            "message": "Name and phone are required."
+        })
 
     conn = get_db()
 
@@ -52,7 +66,10 @@ def add_contact():
     conn.commit()
     conn.close()
 
-    return jsonify({"success": True, "message": "Contact saved successfully."})
+    return jsonify({
+        "success": True,
+        "message": "Contact saved successfully."
+    })
 
 
 @app.route("/contacts")
@@ -72,6 +89,50 @@ def contacts():
             "phone": contact["phone"]
         }
         for contact in contacts
+    ])
+
+
+@app.route("/save_history", methods=["POST"])
+def save_history():
+    data = request.get_json()
+
+    event = data.get("event", "SOS Activated")
+    location = data.get("location", "")
+
+    conn = get_db()
+
+    conn.execute(
+        "INSERT INTO emergency_history (event, location) VALUES (?, ?)",
+        (event, location)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Emergency history saved successfully."
+    })
+
+
+@app.route("/history")
+def history():
+    conn = get_db()
+
+    records = conn.execute(
+        "SELECT * FROM emergency_history ORDER BY id DESC"
+    ).fetchall()
+
+    conn.close()
+
+    return jsonify([
+        {
+            "id": record["id"],
+            "event": record["event"],
+            "location": record["location"],
+            "created_at": record["created_at"]
+        }
+        for record in records
     ])
 
 
