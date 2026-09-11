@@ -417,10 +417,23 @@
                             "contact-box";
 
                         contactBox.innerHTML = `
-                            <strong>👤 ${contact.name}</strong>
-                            <br>
-                            📞 ${contact.phone}
-                        `;
+    <strong>👤 ${contact.name}</strong>
+    <br>
+    📞 ${contact.phone}
+    <br><br>
+
+    <a href="tel:${contact.phone}"
+       style="
+       display:inline-block;
+       padding:8px 15px;
+       background:#28a745;
+       color:white;
+       text-decoration:none;
+       border-radius:6px;
+       ">
+       📱 Call
+    </a>
+`;
 
                         list.appendChild(
                             contactBox
