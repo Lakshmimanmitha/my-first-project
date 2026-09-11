@@ -183,32 +183,67 @@
             );
         }
         function addContact() {
-            const name = document.getElementById("contactName").value;
-            const phone = document.getElementById("contactPhone").value;
-            const list = document.getElementById("contactsList");
+            const name = document.getElementById("contactName").value.trim();
+            const phone = document.getElementById("contactPhone").value.trim();
 
             if (name === "" || phone === "") {
                 alert("Please enter both name and phone number.");
                 return;
             }
 
-            const contact = document.createElement("div");
+            fetch("/add_contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    phone: phone
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Contact saved successfully! ✅");
 
-            contact.style.marginTop = "10px";
-            contact.style.padding = "15px";
-            contact.style.background = "white";
-            contact.style.borderRadius = "10px";
-
-            contact.innerHTML = `
-        <strong>👤 ${name}</strong><br>
-        📞 ${phone}
-    `;
-
-            list.appendChild(contact);
-
-            document.getElementById("contactName").value = "";
-            document.getElementById("contactPhone").value = "";
+                        document.getElementById("contactName").value = "";
+                        document.getElementById("contactPhone").value = "";
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Something went wrong.");
+                });
         }
+        function loadContacts() {
+            fetch("/contacts")
+                .then(response => response.json())
+                .then(contacts => {
+                    const list = document.getElementById("contactsList");
+
+                    list.innerHTML = "";
+
+                    contacts.forEach(contact => {
+                        const contactBox = document.createElement("div");
+
+                        contactBox.style.marginTop = "10px";
+                        contactBox.style.padding = "15px";
+                        contactBox.style.background = "white";
+                        contactBox.style.borderRadius = "10px";
+
+                        contactBox.innerHTML = `
+                    <strong>👤 ${contact.name}</strong><br>
+                    📞 ${contact.phone}
+                `;
+
+                        list.appendChild(contactBox);
+                    });
+                });
+        }
+
+        window.onload = loadContacts;
     </script>
 
 </body>
