@@ -90,6 +90,34 @@ def contacts():
         }
         for contact in contacts
     ])
+@app.route("/delete_contact/<int:contact_id>", methods=["DELETE"])
+def delete_contact(contact_id):
+    conn = get_db()
+
+    contact = conn.execute(
+        "SELECT * FROM contacts WHERE id = ?",
+        (contact_id,)
+    ).fetchone()
+
+    if contact is None:
+        conn.close()
+        return jsonify({
+            "success": False,
+            "message": "Contact not found."
+        }), 404
+
+    conn.execute(
+        "DELETE FROM contacts WHERE id = ?",
+        (contact_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Contact deleted successfully."
+    })
 
 
 @app.route("/save_history", methods=["POST"])
