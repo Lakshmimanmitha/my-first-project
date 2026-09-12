@@ -388,6 +388,121 @@
             const locationBox =
                 document.getElementById("location");
 
+            const sosCard =
+                document.querySelector(".sos-card");
+
+            // Prevent multiple clicks
+            if (document.getElementById("sos-countdown")) {
+                return;
+            }
+
+            // Countdown screen
+            locationBox.innerHTML = `
+        <div id="sos-countdown" style="
+            margin-top:20px;
+            padding:20px;
+            background:#fff7ed;
+            border:2px solid #fb923c;
+            border-radius:14px;
+        ">
+
+            <h3>⚠️ Emergency SOS</h3>
+
+            <p style="margin:10px 0;">
+                SOS will activate in
+                <strong id="countdown-number"
+                        style="font-size:24px;">
+                    5
+                </strong>
+                seconds
+            </p>
+
+            <button onclick="cancelSOS()" style="
+                padding:10px 22px;
+                border:none;
+                border-radius:8px;
+                background:#6b7280;
+                color:white;
+                cursor:pointer;
+                font-weight:bold;
+            ">
+                Cancel
+            </button>
+
+        </div>
+    `;
+
+            let seconds = 5;
+
+            const timer = setInterval(function () {
+
+                seconds--;
+
+                const number =
+                    document.getElementById("countdown-number");
+
+                if (number) {
+                    number.textContent = seconds;
+                }
+
+                if (seconds <= 0) {
+
+                    clearInterval(timer);
+
+                    const countdown =
+                        document.getElementById("sos-countdown");
+
+                    if (countdown) {
+                        countdown.remove();
+                    }
+
+                    activateSOS();
+                }
+
+            }, 1000);
+
+            // Store timer so Cancel can stop it
+            window.sosTimer = timer;
+        }
+
+
+        /* =========================
+           CANCEL SOS
+        ========================= */
+
+        function cancelSOS() {
+
+            if (window.sosTimer) {
+                clearInterval(window.sosTimer);
+                window.sosTimer = null;
+            }
+
+            const locationBox =
+                document.getElementById("location");
+
+            locationBox.innerHTML = `
+        <div style="
+            margin-top:15px;
+            padding:15px;
+            background:#f0fdf4;
+            border-radius:12px;
+            color:#166534;
+        ">
+            ✅ SOS cancelled safely.
+        </div>
+    `;
+        }
+
+
+        /* =========================
+           ACTIVATE SOS
+        ========================= */
+
+        function activateSOS() {
+
+            const locationBox =
+                document.getElementById("location");
+
             if (!navigator.geolocation) {
 
                 locationBox.innerHTML =
@@ -399,7 +514,6 @@
             locationBox.innerHTML =
                 "<p>📍 Getting your location...</p>";
 
-
             navigator.geolocation.getCurrentPosition(
 
                 function (position) {
@@ -410,7 +524,6 @@
                     const longitude =
                         position.coords.longitude;
 
-
                     locationBox.innerHTML = `
 
                 <div style="
@@ -420,14 +533,14 @@
                     margin-top:15px;
                 ">
 
-                    <h3>📍 Current Location</h3>
+                    <h3>🚨 SOS Activated</h3>
 
                     <p>
-                        Latitude: ${latitude}
+                        📍 Latitude: ${latitude}
                     </p>
 
                     <p>
-                        Longitude: ${longitude}
+                        📍 Longitude: ${longitude}
                     </p>
 
                     <br>
@@ -446,7 +559,6 @@
 
                 </div>
             `;
-
 
                     fetch("/save_history", {
 
@@ -486,7 +598,6 @@
 
                 },
 
-
                 function () {
 
                     locationBox.innerHTML =
@@ -495,9 +606,7 @@
                 }
 
             );
-
         }
-
 
         /* =========================
            ADD CONTACT
