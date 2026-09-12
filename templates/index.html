@@ -1,886 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Smart Emergency SOS</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #eef2f7, #f8fafc);
-            padding: 30px 15px;
-            color: #1f2937;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1050px;
-            margin: auto;
-        }
-
-        /* HEADER */
-
-        .header {
-            background: white;
-            border-radius: 22px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #6b7280;
-            font-size: 16px;
-        }
-
-        /* SOS AREA */
-
-        .sos-card {
-            background: white;
-            border-radius: 22px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-
-        .sos-button {
-            width: 190px;
-            height: 190px;
-            border-radius: 50%;
-            border: 8px solid #fee2e2;
-            background: #dc2626;
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 12px 35px rgba(220, 38, 38, 0.35);
-            transition: 0.25s;
-        }
-
-        .sos-button:hover {
-            transform: scale(1.05);
-        }
-
-        .sos-button:active {
-            transform: scale(0.97);
-        }
-
-        .sos-text {
-            margin-top: 20px;
-            color: #6b7280;
-        }
-
-        #location {
-            margin-top: 22px;
-        }
-
-        /* INFO CARDS */
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .info-card {
-            background: white;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
-            text-align: center;
-        }
-
-        .info-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .info-card h3 {
-            margin-bottom: 8px;
-        }
-
-        .info-card p {
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* SECTIONS */
-
-        .section {
-            background: white;
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
-        }
-
-        .section h2 {
-            margin-bottom: 8px;
-        }
-
-        .section-subtitle {
-            color: #6b7280;
-            margin-bottom: 20px;
-        }
-
-        /* INPUTS */
-
-        .input-box {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .input-box:focus {
-            border-color: #dc2626;
-        }
-
-        .add-button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: #111827;
-            color: white;
-            font-size: 15px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        .add-button:hover {
-            background: #374151;
-        }
-
-        /* CONTACT */
-
-        .contact-box {
-            margin-top: 12px;
-            padding: 18px;
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-        }
-
-        .call-button {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 9px 18px;
-            background: #16a34a;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-
-        .call-button:hover {
-            background: #15803d;
-        }
-
-        /* HISTORY */
-
-        .history-box {
-            margin-top: 12px;
-            padding: 18px;
-            background: #f8fafc;
-            border-left: 4px solid #dc2626;
-            border-radius: 10px;
-        }
-
-        .history-box a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-
-        /* FOOTER */
-
-        .footer {
-            text-align: center;
-            color: #6b7280;
-            font-size: 13px;
-            padding: 10px;
-        }
-
-        /* MOBILE */
-
-        @media (max-width: 700px) {
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .sos-button {
-                width: 160px;
-                height: 160px;
-                font-size: 30px;
-            }
-
-            .section {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="container">
-
-        <!-- HEADER -->
-
-        <div class="header">
-
-            <h1>🚨 Smart Emergency SOS</h1>
-
-            <p>
-                Fast assistance when you need it most
-            </p>
-
-        </div>
-
-
-        <!-- SOS -->
-
-        <div class="sos-card">
-
-            <button class="sos-button" onclick="sendSOS()">
-                SOS
-            </button>
-
-            <p class="sos-text">
-                Press the button to share your current location
-            </p>
-
-            <div id="location"></div>
-
-        </div>
-
-
-        <!-- INFO -->
-
-        <div class="info-grid">
-
-            <div class="info-card">
-
-                <div class="info-icon">📍</div>
-
-                <h3>Live Location</h3>
-
-                <p>
-                    Get your current location and open it in Google Maps.
-                </p>
-
-            </div>
-
-
-            <div class="info-card">
-
-                <div class="info-icon">👥</div>
-
-                <h3>Emergency Contacts</h3>
-
-                <p>
-                    Save trusted contacts for quick access.
-                </p>
-
-            </div>
-
-
-            <div class="info-card">
-
-                <div class="info-icon">📝</div>
-
-                <h3>SOS History</h3>
-
-                <p>
-                    Keep track of previous emergency requests.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- CONTACTS -->
-
-        <div class="section">
-
-            <h2>👥 Emergency Contacts</h2>
-
-            <p class="section-subtitle">
-                Add a trusted person for emergency situations.
-            </p>
-
-
-            <input type="text" id="contactName" placeholder="Enter contact name" class="input-box">
-
-
-            <input type="tel" id="contactPhone" placeholder="Enter phone number" class="input-box">
-
-
-            <button onclick="addContact()" class="add-button">
-                + Add Emergency Contact
-            </button>
-
-
-            <div id="contactsList" style="margin-top:20px;"></div>
-
-        </div>
-
-
-        <!-- HISTORY -->
-
-        <div class="section">
-
-            <h2>📝 Emergency History</h2>
-
-            <p class="section-subtitle">
-                Previous SOS requests
-            </p>
-
-
-            <div id="historyList"></div>
-
-        </div>
-
-
-        <div class="footer">
-            🔒 Smart Emergency SOS • Emergency assistance system
-        </div>
-
+function loadContacts() {
+fetch("/contacts")
+.then(response => response.json())
+.then(contacts => {
+
+const list = document.getElementById("contactsList");
+
+if (!list) {
+console.error("contactsList not found");
+return;
+}
+
+list.innerHTML = "";
+
+if (contacts.length === 0) {
+list.innerHTML =
+"<p style='color:#6b7280;'>No emergency contacts added yet.</p>";
+return;
+}
+
+contacts.forEach(contact => {
+
+const contactBox = document.createElement("div");
+contactBox.className = "contact-box";
+
+contactBox.innerHTML = `
+<div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        gap:15px;
+                        flex-wrap:wrap;
+                    ">
+
+    <div>
+        <strong>👤 ${contact.name}</strong>
+        <br>
+        📞 ${contact.phone}
     </div>
 
-
-    <script>
-
-        /* =========================
-           SOS
-        ========================= */
-
-        function sendSOS() {
-
-            const locationBox =
-                document.getElementById("location");
-
-            const sosCard =
-                document.querySelector(".sos-card");
-
-            // Prevent multiple clicks
-            if (document.getElementById("sos-countdown")) {
-                return;
-            }
-
-            // Countdown screen
-            locationBox.innerHTML = `
-        <div id="sos-countdown" style="
-            margin-top:20px;
-            padding:20px;
-            background:#fff7ed;
-            border:2px solid #fb923c;
-            border-radius:14px;
-        ">
-
-            <h3>⚠️ Emergency SOS</h3>
-
-            <p style="margin:10px 0;">
-                SOS will activate in
-                <strong id="countdown-number"
-                        style="font-size:24px;">
-                    5
-                </strong>
-                seconds
-            </p>
-
-            <button onclick="cancelSOS()" style="
-                padding:10px 22px;
-                border:none;
-                border-radius:8px;
-                background:#6b7280;
-                color:white;
-                cursor:pointer;
-                font-weight:bold;
-            ">
-                Cancel
-            </button>
-
-        </div>
-    `;
-
-            let seconds = 5;
-
-            const timer = setInterval(function () {
-
-                seconds--;
-
-                const number =
-                    document.getElementById("countdown-number");
-
-                if (number) {
-                    number.textContent = seconds;
-                }
-
-                if (seconds <= 0) {
-
-                    clearInterval(timer);
-
-                    const countdown =
-                        document.getElementById("sos-countdown");
-
-                    if (countdown) {
-                        countdown.remove();
-                    }
-
-                    activateSOS();
-                }
-
-            }, 1000);
-
-            // Store timer so Cancel can stop it
-            window.sosTimer = timer;
-        }
-
-
-        /* =========================
-           CANCEL SOS
-        ========================= */
-
-        function cancelSOS() {
-
-            if (window.sosTimer) {
-                clearInterval(window.sosTimer);
-                window.sosTimer = null;
-            }
-
-            const locationBox =
-                document.getElementById("location");
-
-            locationBox.innerHTML = `
-        <div style="
-            margin-top:15px;
-            padding:15px;
-            background:#f0fdf4;
-            border-radius:12px;
-            color:#166534;
-        ">
-            ✅ SOS cancelled safely.
-        </div>
-    `;
-        }
-
-
-        /* =========================
-           ACTIVATE SOS
-        ========================= */
-
-        function activateSOS() {
-
-            const locationBox =
-                document.getElementById("location");
-
-            if (!navigator.geolocation) {
-
-                locationBox.innerHTML =
-                    "❌ Location is not supported by this browser.";
-
-                return;
-            }
-
-            locationBox.innerHTML =
-                "<p>📍 Getting your location...</p>";
-
-            navigator.geolocation.getCurrentPosition(
-
-                function (position) {
-
-                    const latitude =
-                        position.coords.latitude;
-
-                    const longitude =
-                        position.coords.longitude;
-
-                    locationBox.innerHTML = `
-
-                <div style="
-                    background:#f0fdf4;
-                    padding:18px;
-                    border-radius:12px;
-                    margin-top:15px;
-                ">
-
-                    <h3>🚨 SOS Activated</h3>
-
-                    <p>
-                        📍 Latitude: ${latitude}
-                    </p>
-
-                    <p>
-                        📍 Longitude: ${longitude}
-                    </p>
-
-                    <br>
-
-                    <a
-                        href="https://www.google.com/maps?q=${latitude},${longitude}"
-                        target="_blank"
-                        style="
-                            color:#2563eb;
-                            font-weight:bold;
-                            text-decoration:none;
-                        "
-                    >
-                        🗺️ Open in Google Maps
-                    </a>
-
-                </div>
-            `;
-
-                    fetch("/save_history", {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            event: "SOS Activated",
-
-                            location:
-                                latitude + "," + longitude
-
-                        })
-
-                    })
-
-                        .then(response => response.json())
-
-                        .then(() => {
-
-                            loadHistory();
-
-                        })
-
-                        .catch(error => {
-
-                            console.error(
-                                "History error:",
-                                error
-                            );
-
-                        });
-
-                },
-
-                function () {
-
-                    locationBox.innerHTML =
-                        "❌ Location permission was not granted.";
-
-                }
-
-            );
-        }
-
-        /* =========================
-           ADD CONTACT
-        ========================= */
-
-        function addContact() {
-
-            const name =
-                document
-                    .getElementById("contactName")
-                    .value.trim();
-
-
-            const phone =
-                document
-                    .getElementById("contactPhone")
-                    .value.trim();
-
-
-            if (!name || !phone) {
-
-                alert(
-                    "Please enter both name and phone number."
-                );
-
-                return;
-            }
-
-
-            fetch("/add_contact", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    name: name,
-                    phone: phone
-
-                })
-
-            })
-
-                .then(response => response.json())
-
-                .then(data => {
-
-                    if (data.success) {
-
-                        alert(
-                            "Contact saved successfully! ✅"
-                        );
-
-
-                        document
-                            .getElementById("contactName")
-                            .value = "";
-
-
-                        document
-                            .getElementById("contactPhone")
-                            .value = "";
-
-
-                        loadContacts();
-
-                    }
-
-                    else {
-
-                        alert(data.message);
-
-                    }
-
-                })
-
-                .catch(error => {
-
-                    console.error(error);
-
-                    alert(
-                        "Something went wrong."
-                    );
-
-                });
-
-        }
-
-
-        /* =========================
-           LOAD CONTACTS
-        ========================= */
-
-        function loadContacts() {
-
-            fetch("/contacts")
-
-                .then(response => response.json())
-
-                .then(contacts => {
-
-                    const list =
-                        document.getElementById(
-                            "contactsList"
-                        );
-
-
-                    list.innerHTML = "";
-
-
-                    if (contacts.length === 0) {
-
-                        list.innerHTML =
-                            "<p style='color:#6b7280;'>No emergency contacts added yet.</p>";
-
-                        return;
-                    }
-
-
-                    contacts.forEach(contact => {
-
-                        const contactBox =
-                            document.createElement("div");
-
-
-                        contactBox.className =
-                            "contact-box";
-
-
-                        contactBox.innerHTML = `
-
-                <strong>
-                    👤 ${contact.name}
-                </strong>
-
-                <br>
-
-                📞 ${contact.phone}
-
-                <br>
-
-                <a
-                    href="tel:${contact.phone}"
-                    class="call-button"
-                >
-                    📱 Call
-                </a>
-
-            `;
-
-
-                        list.appendChild(
-                            contactBox
-                        );
-
-                    });
-
-                })
-
-                .catch(error => {
-
-                    console.error(
-                        "Contact loading error:",
-                        error
-                    );
-
-                });
-
-        }
-
-
-        /* =========================
-           LOAD HISTORY
-        ========================= */
-
-        function loadHistory() {
-
-            fetch("/history")
-
-                .then(response => response.json())
-
-                .then(records => {
-
-                    const list =
-                        document.getElementById(
-                            "historyList"
-                        );
-
-
-                    list.innerHTML = "";
-
-
-                    if (records.length === 0) {
-
-                        list.innerHTML =
-                            "<p style='color:#6b7280;'>No emergency history yet.</p>";
-
-                        return;
-                    }
-
-
-                    records.forEach(record => {
-
-                        const historyBox =
-                            document.createElement("div");
-
-
-                        historyBox.className =
-                            "history-box";
-
-
-                        historyBox.innerHTML = `
-
-                <strong>
-                    🚨 ${record.event}
-                </strong>
-
-                <br>
-
-                📍 ${record.location}
-
-                <br>
-
-                🕐 ${record.created_at}
-
-                <br><br>
-
-                <a
-                    href="https://www.google.com/maps?q=${record.location}"
-                    target="_blank"
-                >
-                    🗺️ View Location
-                </a>
-
-            `;
-
-
-                        list.appendChild(
-                            historyBox
-                        );
-
-                    });
-
-                })
-
-                .catch(error => {
-
-                    console.error(
-                        "History loading error:",
-                        error
-                    );
-
-                });
-
-        }
-
-
-        /* =========================
-           PAGE LOAD
-        ========================= */
-
-        window.onload = function () {
-
-            loadContacts();
-
-            loadHistory();
-
-        };
-
-    </script>
-
-</body>
-
-</html>
+    <div style="
+                            display:flex;
+                            gap:8px;
+                            flex-wrap:wrap;
+                        ">
+
+        <a href="tel:${contact.phone}" class="call-button">
+            📱 Call
+        </a>
+
+        <button type="button" onclick="deleteContact(${contact.id})" style="
+                                    padding:9px 15px;
+                                    background:#dc2626;
+                                    color:white;
+                                    border:none;
+                                    border-radius:8px;
+                                    cursor:pointer;
+                                    font-weight:bold;
+                                ">
+            🗑️ Delete
+        </button>
+
+    </div>
+</div>
+`;
+
+list.appendChild(contactBox);
+});
+})
+.catch(error => {
+console.error("Contact loading error:", error);
+});
+}
+
+
+function deleteContact(id) {
+
+const confirmed = confirm(
+"Are you sure you want to delete this emergency contact?"
+);
+
+if (!confirmed) {
+return;
+}
+
+fetch(`/delete_contact/${id}`, {
+method: "DELETE"
+})
+.then(response => response.json())
+.then(data => {
+
+if (data.success) {
+
+alert("Contact deleted successfully! 🗑️");
+
+loadContacts();
+
+} else {
+
+alert(
+data.message || "Unable to delete contact."
+);
+}
+
+})
+.catch(error => {
+
+console.error("Delete error:", error);
+
+alert("Unable to delete contact.");
+});
+}
