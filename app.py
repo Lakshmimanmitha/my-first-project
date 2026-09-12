@@ -15,7 +15,6 @@ def get_db():
 def init_db():
     conn = get_db()
 
-    # Emergency contacts table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,7 +23,6 @@ def init_db():
         )
     """)
 
-    # Emergency history table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS emergency_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,9 +41,14 @@ def home():
     return render_template("index.html")
 
 
+# =========================
+# ADD CONTACT
+# =========================
+
 @app.route("/add_contact", methods=["POST"])
 def add_contact():
-    data = request.get_json()
+
+    data = request.get_json() or {}
 
     name = data.get("name", "").strip()
     phone = data.get("phone", "").strip()
@@ -54,7 +57,7 @@ def add_contact():
         return jsonify({
             "success": False,
             "message": "Name and phone are required."
-        })
+        }), 400
 
     conn = get_db()
 
@@ -72,11 +75,16 @@ def add_contact():
     })
 
 
+# =========================
+# GET CONTACTS
+# =========================
+
 @app.route("/contacts")
 def contacts():
+
     conn = get_db()
 
-    contacts = conn.execute(
+    rows = conn.execute(
         "SELECT * FROM contacts ORDER BY id DESC"
     ).fetchall()
 
@@ -84,29 +92,24 @@ def contacts():
 
     return jsonify([
         {
-            "id": contact["id"],
-            "name": contact["name"],
-            "phone": contact["phone"]
+            "id": row["id"],
+            "name": row["name"],
+            "phone": row["phone"]
         }
-        for contact in contacts
+        for row in rows
     ])
+
+
+# =========================
+# DELETE CONTACT
+# =========================
+
 @app.route("/delete_contact/<int:contact_id>", methods=["DELETE"])
 def delete_contact(contact_id):
+
     conn = get_db()
 
-    contact = conn.execute(
-        "SELECT * FROM contacts WHERE id = ?",
-        (contact_id,)
-    ).fetchone()
-
-    if contact is None:
-        conn.close()
-        return jsonify({
-            "success": False,
-            "message": "Contact not found."
-        }), 404
-
-    conn.execute(
+    cursor = conn.execute(
         "DELETE FROM contacts WHERE id = ?",
         (contact_id,)
     )
@@ -114,15 +117,26 @@ def delete_contact(contact_id):
     conn.commit()
     conn.close()
 
+    if cursor.rowcount == 0:
+        return jsonify({
+            "success": False,
+            "message": "Contact not found."
+        }), 404
+
     return jsonify({
         "success": True,
         "message": "Contact deleted successfully."
     })
 
 
+# =========================
+# SAVE SOS HISTORY
+# =========================
+
 @app.route("/save_history", methods=["POST"])
 def save_history():
-    data = request.get_json()
+
+    data = request.get_json() or {}
 
     event = data.get("event", "SOS Activated")
     location = data.get("location", "")
@@ -130,7 +144,11 @@ def save_history():
     conn = get_db()
 
     conn.execute(
-        "INSERT INTO emergency_history (event, location) VALUES (?, ?)",
+        """
+        INSERT INTO emergency_history
+        (event, location)
+        VALUES (?, ?)
+        """,
         (event, location)
     )
 
@@ -143,12 +161,20 @@ def save_history():
     })
 
 
+# =========================
+# GET HISTORY
+# =========================
+
 @app.route("/history")
 def history():
+
     conn = get_db()
 
     records = conn.execute(
-        "SELECT * FROM emergency_history ORDER BY id DESC"
+        """
+        SELECT * FROM emergency_history
+        ORDER BY id DESC
+        """
     ).fetchall()
 
     conn.close()
@@ -164,7 +190,41 @@ def history():
     ])
 
 
+# =========================
+# DELETE HISTORY
+# =========================
+
+@app.route("/delete_history/<int:history_id>", methods=["DELETE"])
+def delete_history(history_id):
+
+    conn = get_db()
+
+    cursor = conn.execute(
+        "DELETE FROM emergency_history WHERE id = ?",
+        (history_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    if cursor.rowcount == 0:
+        return jsonify({
+            "success": False,
+            "message": "History record not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "message": "History deleted successfully."
+    })
+
+
+# =========================
+# INITIALIZE DATABASE
+# =========================
+
 init_db()
+
 
 if __name__ == "__main__":
     app.run(debug=True)
