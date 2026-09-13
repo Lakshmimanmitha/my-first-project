@@ -262,6 +262,7 @@
                     if (navigator.geolocation) {
 
                         navigator.geolocation.getCurrentPosition(
+
                             function (position) {
 
                                 const location =
@@ -273,6 +274,8 @@
                                     "SOS Activated",
                                     location
                                 );
+
+                                showEmergencyAlert(location);
                             },
 
                             function (error) {
@@ -286,6 +289,10 @@
                                     "SOS Activated",
                                     "Location unavailable"
                                 );
+
+                                showEmergencyAlert(
+                                    "Location unavailable"
+                                );
                             }
                         );
 
@@ -293,6 +300,10 @@
 
                         saveHistory(
                             "SOS Activated",
+                            "Location unavailable"
+                        );
+
+                        showEmergencyAlert(
                             "Location unavailable"
                         );
                     }
@@ -306,6 +317,67 @@
             }, 1000);
         }
 
+        function showEmergencyAlert(location) {
+
+            fetch("/contacts")
+                .then(response => response.json())
+                .then(contacts => {
+
+                    if (contacts.length === 0) {
+
+                        alert(
+                            "SOS activated, but no emergency contacts are saved."
+                        );
+
+                        return;
+                    }
+
+                    const emergencyMessage =
+                        "🚨 EMERGENCY ALERT 🚨\n\n" +
+                        "SOS has been activated.\n" +
+                        "Please contact me immediately.\n\n" +
+                        "📍 My location:\n" +
+                        location;
+
+                    const phoneNumber = contacts[0].phone;
+
+                    const smsLink =
+                        "sms:" +
+                        phoneNumber +
+                        "?body=" +
+                        encodeURIComponent(emergencyMessage);
+
+                    // Try opening the SMS application
+                    const smsWindow = window.open(
+                        smsLink,
+                        "_self"
+                    );
+
+                    // Fallback message if SMS app cannot be opened
+                    setTimeout(function () {
+
+                        alert(
+                            "SOS activated successfully.\n\n" +
+                            "Emergency message is ready.\n\n" +
+                            "Please open your SMS app and send the alert to:\n" +
+                            phoneNumber
+                        );
+
+                    }, 1500);
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "Emergency contact alert error:",
+                        error
+                    );
+
+                    alert(
+                        "SOS activated, but emergency contacts could not be loaded."
+                    );
+                });
+        }
 
         /* =========================
            CANCEL SOS
