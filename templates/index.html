@@ -259,10 +259,43 @@
                     message.innerText =
                         "Emergency alert activated.";
 
-                    saveHistory(
-                        "SOS Activated",
-                        "Location unavailable"
-                    );
+                    if (navigator.geolocation) {
+
+                        navigator.geolocation.getCurrentPosition(
+                            function (position) {
+
+                                const location =
+                                    position.coords.latitude +
+                                    ", " +
+                                    position.coords.longitude;
+
+                                saveHistory(
+                                    "SOS Activated",
+                                    location
+                                );
+                            },
+
+                            function (error) {
+
+                                console.error(
+                                    "Location error:",
+                                    error
+                                );
+
+                                saveHistory(
+                                    "SOS Activated",
+                                    "Location unavailable"
+                                );
+                            }
+                        );
+
+                    } else {
+
+                        saveHistory(
+                            "SOS Activated",
+                            "Location unavailable"
+                        );
+                    }
 
                     return;
                 }
