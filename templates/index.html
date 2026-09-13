@@ -15,31 +15,51 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f3f4f6;
+            background: linear-gradient(135deg, #fef2f2, #f3f4f6);
             color: #111827;
         }
 
         .container {
+            width: 100%;
             max-width: 700px;
-            margin: 40px auto;
-            padding: 20px;
+            margin: 0 auto;
+            padding: 25px 18px;
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.97);
             padding: 25px;
             margin-bottom: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
             text-align: center;
             color: #dc2626;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-top: 0;
+        }
+
+        .status {
+            width: fit-content;
+            margin: 15px auto;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 14px;
+            font-weight: bold;
         }
 
         h2 {
             margin-top: 0;
+            color: #1f2937;
         }
 
         .sos-button {
@@ -48,29 +68,54 @@
             height: 180px;
             margin: 25px auto;
             border-radius: 50%;
-            border: none;
+            border: 7px solid #fee2e2;
             background: #dc2626;
             color: white;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.35);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.35);
+            animation: pulse 2s infinite;
+            transition: transform 0.2s;
         }
 
         .sos-button:hover {
             background: #b91c1c;
+            transform: scale(1.04);
+        }
+
+        .sos-button:active {
+            transform: scale(0.96);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45);
+            }
+
+            70% {
+                box-shadow: 0 0 0 18px rgba(220, 38, 38, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+            }
         }
 
         .cancel-button {
             display: block;
             margin: 10px auto;
-            padding: 12px 25px;
+            padding: 11px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             background: #6b7280;
             color: white;
             cursor: pointer;
             font-weight: bold;
+        }
+
+        .cancel-button:hover {
+            background: #4b5563;
         }
 
         .countdown {
@@ -78,35 +123,46 @@
             font-size: 28px;
             font-weight: bold;
             color: #dc2626;
-            min-height: 35px;
+            min-height: 38px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             margin: 7px 0;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-radius: 9px;
             font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .add-button {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             margin-top: 8px;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             background: #2563eb;
             color: white;
             font-weight: bold;
             cursor: pointer;
+            font-size: 15px;
+        }
+
+        .add-button:hover {
+            background: #1d4ed8;
         }
 
         .contact-box {
-            padding: 15px;
+            padding: 16px;
             margin-top: 12px;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
+            border-radius: 12px;
             background: #f9fafb;
         }
 
@@ -137,11 +193,12 @@
         }
 
         .history-item {
-            padding: 12px;
+            padding: 14px;
             margin-top: 10px;
             background: #f9fafb;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #e5e7eb;
+            line-height: 1.6;
         }
 
         .history-delete {
@@ -153,6 +210,43 @@
             border-radius: 6px;
             cursor: pointer;
         }
+
+        .section-icon {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 14px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .sos-button {
+                width: 155px;
+                height: 155px;
+                font-size: 30px;
+            }
+
+            .contact-box>div {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .contact-box a,
+            .contact-box button {
+                text-align: center;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -160,8 +254,19 @@
 
     <div class="container">
 
+        <!-- SOS -->
+
         <div class="card">
+
             <h1>🚨 Smart Emergency SOS</h1>
+
+            <p class="subtitle">
+                Quick emergency assistance with location support
+            </p>
+
+            <div class="status">
+                🟢 System Ready
+            </div>
 
             <div id="countdown" class="countdown"></div>
 
@@ -174,6 +279,7 @@
             </button>
 
             <p id="sosMessage" class="message"></p>
+
         </div>
 
 
@@ -181,7 +287,10 @@
 
         <div class="card">
 
-            <h2>📞 Emergency Contacts</h2>
+            <h2>
+                <span class="section-icon">📞</span>
+                Emergency Contacts
+            </h2>
 
             <input type="text" id="contactName" placeholder="Enter contact name">
 
@@ -202,7 +311,10 @@
 
         <div class="card">
 
-            <h2>📋 Emergency History</h2>
+            <h2>
+                <span class="section-icon">📋</span>
+                Emergency History
+            </h2>
 
             <div id="historyList">
                 <p style="color:#6b7280;">
@@ -254,7 +366,8 @@
                     clearInterval(countdownTimer);
                     countdownTimer = null;
 
-                    countdown.innerText = "🚨 SOS ACTIVATED";
+                    countdown.innerText =
+                        "🚨 SOS ACTIVATED";
 
                     message.innerText =
                         "Emergency alert activated.";
@@ -316,17 +429,24 @@
 
             }, 1000);
         }
+
+
+        /* =========================
+           EMERGENCY SMS ALERT
+        ========================= */
+
         function showEmergencyAlert(location) {
-            console.log("CONTACT ALERT FUNCTION RUNNING");
 
             fetch("/contacts")
                 .then(response => response.json())
                 .then(contacts => {
 
                     if (contacts.length === 0) {
+
                         alert(
                             "SOS activated, but no emergency contacts are saved."
                         );
+
                         return;
                     }
 
@@ -337,86 +457,75 @@
                         "📍 My location:\n" +
                         location;
 
-                    // Show alert options for every saved contact
-                    let alertMessage =
-                        "🚨 SOS ACTIVATED\n\n" +
-                        "Choose a contact to alert:\n\n";
-
-                    contacts.forEach((contact, index) => {
-
-                        alertMessage +=
-                            (index + 1) +
-                            ". " +
-                            contact.name +
-                            " - " +
-                            contact.phone +
-                            "\n";
-                    });
-
-                    alertMessage +=
-                        "\nYour SMS app will open for the selected contact.";
-
-                    // Create alert container
                     const container =
                         document.createElement("div");
 
                     container.style.cssText = `
-                position:fixed;
-                inset:0;
-                background:rgba(0,0,0,0.6);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                z-index:9999;
-                padding:20px;
-            `;
+                        position:fixed;
+                        inset:0;
+                        background:rgba(0,0,0,0.65);
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        z-index:9999;
+                        padding:20px;
+                    `;
 
                     const box =
                         document.createElement("div");
 
                     box.style.cssText = `
-                background:white;
-                width:100%;
-                max-width:420px;
-                border-radius:16px;
-                padding:22px;
-                box-shadow:0 10px 30px rgba(0,0,0,0.3);
-            `;
+                        background:white;
+                        width:100%;
+                        max-width:420px;
+                        border-radius:18px;
+                        padding:22px;
+                        box-shadow:0 15px 40px rgba(0,0,0,0.3);
+                    `;
 
                     box.innerHTML = `
-                <h2 style="margin-top:0;color:#dc2626;">
-                    🚨 Alert Emergency Contact
-                </h2>
+                        <h2 style="
+                            margin-top:0;
+                            color:#dc2626;
+                            text-align:center;
+                        ">
+                            🚨 Alert Emergency Contact
+                        </h2>
 
-                <p style="color:#555;">
-                    Select a contact to send the SOS alert.
-                </p>
+                        <p style="
+                            color:#555;
+                            text-align:center;
+                        ">
+                            Select a contact to send the SOS alert.
+                        </p>
 
-                <div id="alertContactButtons"></div>
+                        <div id="alertContactButtons"></div>
 
-                <button
-                    id="closeAlertBox"
-                    style="
-                        width:100%;
-                        margin-top:12px;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#6b7280;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    Close
-                </button>
-            `;
+                        <button
+                            id="closeAlertBox"
+                            style="
+                                width:100%;
+                                margin-top:12px;
+                                padding:12px;
+                                border:none;
+                                border-radius:9px;
+                                background:#6b7280;
+                                color:white;
+                                font-weight:bold;
+                                cursor:pointer;
+                            "
+                        >
+                            Close
+                        </button>
+                    `;
 
                     container.appendChild(box);
                     document.body.appendChild(container);
 
                     const buttons =
-                        box.querySelector("#alertContactButtons");
+                        box.querySelector(
+                            "#alertContactButtons"
+                        );
 
                     contacts.forEach(contact => {
 
@@ -426,18 +535,18 @@
                         button.type = "button";
 
                         button.style.cssText = `
-                    display:block;
-                    width:100%;
-                    margin:8px 0;
-                    padding:13px;
-                    border:none;
-                    border-radius:9px;
-                    background:#dc2626;
-                    color:white;
-                    font-weight:bold;
-                    cursor:pointer;
-                    text-align:left;
-                `;
+                            display:block;
+                            width:100%;
+                            margin:8px 0;
+                            padding:13px;
+                            border:none;
+                            border-radius:9px;
+                            background:#dc2626;
+                            color:white;
+                            font-weight:bold;
+                            cursor:pointer;
+                            text-align:left;
+                        `;
 
                         button.innerText =
                             "📱 " +
@@ -468,6 +577,7 @@
 
                         container.remove();
                     };
+
                 })
                 .catch(error => {
 
@@ -481,6 +591,8 @@
                     );
                 });
         }
+
+
         /* =========================
            CANCEL SOS
         ========================= */
@@ -493,10 +605,13 @@
                 countdownTimer = null;
             }
 
-            document.getElementById("countdown").innerText = "";
+            document.getElementById(
+                "countdown"
+            ).innerText = "";
 
-            document.getElementById("sosMessage").innerText =
-                "SOS cancelled.";
+            document.getElementById(
+                "sosMessage"
+            ).innerText = "SOS cancelled.";
         }
 
 
@@ -507,13 +622,19 @@
         function addContact() {
 
             const name =
-                document.getElementById("contactName").value.trim();
+                document.getElementById(
+                    "contactName"
+                ).value.trim();
 
             const phone =
-                document.getElementById("contactPhone").value.trim();
+                document.getElementById(
+                    "contactPhone"
+                ).value.trim();
 
             const message =
-                document.getElementById("contactMessage");
+                document.getElementById(
+                    "contactMessage"
+                );
 
             if (!name || !phone) {
 
@@ -542,12 +663,18 @@
 
                 .then(data => {
 
-                    message.innerText = data.message;
+                    message.innerText =
+                        data.message;
 
                     if (data.success) {
 
-                        document.getElementById("contactName").value = "";
-                        document.getElementById("contactPhone").value = "";
+                        document.getElementById(
+                            "contactName"
+                        ).value = "";
+
+                        document.getElementById(
+                            "contactPhone"
+                        ).value = "";
 
                         loadContacts();
                     }
@@ -577,7 +704,9 @@
                 .then(contacts => {
 
                     const list =
-                        document.getElementById("contactsList");
+                        document.getElementById(
+                            "contactsList"
+                        );
 
                     list.innerHTML = "";
 
@@ -599,52 +728,51 @@
 
                         contactBox.innerHTML = `
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    gap:15px;
-                    flex-wrap:wrap;
-                ">
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:center;
+                                gap:15px;
+                                flex-wrap:wrap;
+                            ">
 
-                    <div>
+                                <div>
 
-                        <strong>
-                            👤 ${contact.name}
-                        </strong>
+                                    <strong>
+                                        👤 ${contact.name}
+                                    </strong>
 
-                        <br>
+                                    <br>
 
-                        📞 ${contact.phone}
+                                    📞 ${contact.phone}
 
-                    </div>
+                                </div>
 
-                    <div style="
-                        display:flex;
-                        gap:8px;
-                        flex-wrap:wrap;
-                    ">
+                                <div style="
+                                    display:flex;
+                                    gap:8px;
+                                    flex-wrap:wrap;
+                                ">
 
-                        <a
-                            href="tel:${contact.phone}"
-                            class="call-button"
-                        >
-                            📱 Call
-                        </a>
+                                    <a
+                                        href="tel:${contact.phone}"
+                                        class="call-button"
+                                    >
+                                        📱 Call
+                                    </a>
 
-                        <button
-                            type="button"
-                            class="delete-button"
-                            onclick="deleteContact(${contact.id})"
-                        >
-                            🗑️ Delete
-                        </button>
+                                    <button
+                                        type="button"
+                                        class="delete-button"
+                                        onclick="deleteContact(${contact.id})"
+                                    >
+                                        🗑️ Delete
+                                    </button>
 
-                    </div>
+                                </div>
 
-                </div>
-
-            `;
+                            </div>
+                        `;
 
                         list.appendChild(contactBox);
                     });
@@ -657,7 +785,6 @@
                         "Contact loading error:",
                         error
                     );
-
                 });
         }
 
@@ -700,7 +827,6 @@
                             data.message ||
                             "Unable to delete contact."
                         );
-
                     }
 
                 })
@@ -715,7 +841,6 @@
                     alert(
                         "Unable to delete contact."
                     );
-
                 });
         }
 
@@ -760,7 +885,6 @@
                         "History error:",
                         error
                     );
-
                 });
         }
 
@@ -778,7 +902,9 @@
                 .then(records => {
 
                     const list =
-                        document.getElementById("historyList");
+                        document.getElementById(
+                            "historyList"
+                        );
 
                     list.innerHTML = "";
 
@@ -800,31 +926,32 @@
 
                         item.innerHTML = `
 
-                <strong>
-                    🚨 ${record.event}
-                </strong>
+                            <strong>
+                                🚨 ${record.event}
+                            </strong>
 
-                <br>
+                            <br>
 
-                📍 ${record.location || "Location unavailable"}
+                            📍 ${record.location ||
+                            "Location unavailable"
+                            }
 
-                <br>
+                            <br>
 
-                🕒 ${record.created_at}
+                            🕒 ${record.created_at}
 
-                <br>
+                            <br>
 
-                <button
-                    class="history-delete"
-                    onclick="deleteHistory(${record.id})"
-                >
-                    🗑️ Delete
-                </button>
+                            <button
+                                class="history-delete"
+                                onclick="deleteHistory(${record.id})"
+                            >
+                                🗑️ Delete
+                            </button>
 
-            `;
+                        `;
 
                         list.appendChild(item);
-
                     });
 
                 })
@@ -835,7 +962,6 @@
                         "History loading error:",
                         error
                     );
-
                 });
         }
 
@@ -876,7 +1002,6 @@
                             data.message ||
                             "Unable to delete history."
                         );
-
                     }
 
                 })
@@ -891,7 +1016,6 @@
                     alert(
                         "Unable to delete history."
                     );
-
                 });
         }
 
