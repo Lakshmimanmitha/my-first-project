@@ -316,19 +316,17 @@
 
             }, 1000);
         }
-
         function showEmergencyAlert(location) {
+            console.log("CONTACT ALERT FUNCTION RUNNING");
 
             fetch("/contacts")
                 .then(response => response.json())
                 .then(contacts => {
 
                     if (contacts.length === 0) {
-
                         alert(
                             "SOS activated, but no emergency contacts are saved."
                         );
-
                         return;
                     }
 
@@ -339,32 +337,137 @@
                         "📍 My location:\n" +
                         location;
 
-                    const phoneNumber = contacts[0].phone;
+                    // Show alert options for every saved contact
+                    let alertMessage =
+                        "🚨 SOS ACTIVATED\n\n" +
+                        "Choose a contact to alert:\n\n";
 
-                    const smsLink =
-                        "sms:" +
-                        phoneNumber +
-                        "?body=" +
-                        encodeURIComponent(emergencyMessage);
+                    contacts.forEach((contact, index) => {
 
-                    // Try opening the SMS application
-                    const smsWindow = window.open(
-                        smsLink,
-                        "_self"
-                    );
+                        alertMessage +=
+                            (index + 1) +
+                            ". " +
+                            contact.name +
+                            " - " +
+                            contact.phone +
+                            "\n";
+                    });
 
-                    // Fallback message if SMS app cannot be opened
-                    setTimeout(function () {
+                    alertMessage +=
+                        "\nYour SMS app will open for the selected contact.";
 
-                        alert(
-                            "SOS activated successfully.\n\n" +
-                            "Emergency message is ready.\n\n" +
-                            "Please open your SMS app and send the alert to:\n" +
-                            phoneNumber
-                        );
+                    // Create alert container
+                    const container =
+                        document.createElement("div");
 
-                    }, 1500);
+                    container.style.cssText = `
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,0.6);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                z-index:9999;
+                padding:20px;
+            `;
 
+                    const box =
+                        document.createElement("div");
+
+                    box.style.cssText = `
+                background:white;
+                width:100%;
+                max-width:420px;
+                border-radius:16px;
+                padding:22px;
+                box-shadow:0 10px 30px rgba(0,0,0,0.3);
+            `;
+
+                    box.innerHTML = `
+                <h2 style="margin-top:0;color:#dc2626;">
+                    🚨 Alert Emergency Contact
+                </h2>
+
+                <p style="color:#555;">
+                    Select a contact to send the SOS alert.
+                </p>
+
+                <div id="alertContactButtons"></div>
+
+                <button
+                    id="closeAlertBox"
+                    style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border:none;
+                        border-radius:8px;
+                        background:#6b7280;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    Close
+                </button>
+            `;
+
+                    container.appendChild(box);
+                    document.body.appendChild(container);
+
+                    const buttons =
+                        box.querySelector("#alertContactButtons");
+
+                    contacts.forEach(contact => {
+
+                        const button =
+                            document.createElement("button");
+
+                        button.type = "button";
+
+                        button.style.cssText = `
+                    display:block;
+                    width:100%;
+                    margin:8px 0;
+                    padding:13px;
+                    border:none;
+                    border-radius:9px;
+                    background:#dc2626;
+                    color:white;
+                    font-weight:bold;
+                    cursor:pointer;
+                    text-align:left;
+                `;
+
+                        button.innerText =
+                            "📱 " +
+                            contact.name +
+                            " - " +
+                            contact.phone;
+
+                        button.onclick = function () {
+
+                            const smsLink =
+                                "sms:" +
+                                contact.phone +
+                                "?body=" +
+                                encodeURIComponent(
+                                    emergencyMessage
+                                );
+
+                            window.location.href =
+                                smsLink;
+                        };
+
+                        buttons.appendChild(button);
+                    });
+
+                    box.querySelector(
+                        "#closeAlertBox"
+                    ).onclick = function () {
+
+                        container.remove();
+                    };
                 })
                 .catch(error => {
 
@@ -378,7 +481,6 @@
                     );
                 });
         }
-
         /* =========================
            CANCEL SOS
         ========================= */
