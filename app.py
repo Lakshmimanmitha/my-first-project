@@ -6,15 +6,24 @@ app = Flask(__name__)
 DATABASE = "database.db"
 
 
+# =========================
+# DATABASE CONNECTION
+# =========================
+
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
 
+# =========================
+# INITIALIZE DATABASE
+# =========================
+
 def init_db():
     conn = get_db()
 
+    # Emergency contacts
     conn.execute("""
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,6 +32,7 @@ def init_db():
         )
     """)
 
+    # Emergency history
     conn.execute("""
         CREATE TABLE IF NOT EXISTS emergency_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +45,10 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+# =========================
+# HOME
+# =========================
 
 @app.route("/")
 def home():
@@ -84,7 +98,7 @@ def contacts():
 
     conn = get_db()
 
-    rows = conn.execute(
+    records = conn.execute(
         "SELECT * FROM contacts ORDER BY id DESC"
     ).fetchall()
 
@@ -92,11 +106,11 @@ def contacts():
 
     return jsonify([
         {
-            "id": row["id"],
-            "name": row["name"],
-            "phone": row["phone"]
+            "id": record["id"],
+            "name": record["name"],
+            "phone": record["phone"]
         }
-        for row in rows
+        for record in records
     ])
 
 
@@ -109,19 +123,27 @@ def delete_contact(contact_id):
 
     conn = get_db()
 
-    cursor = conn.execute(
+    contact = conn.execute(
+        "SELECT * FROM contacts WHERE id = ?",
+        (contact_id,)
+    ).fetchone()
+
+    if contact is None:
+
+        conn.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Contact not found."
+        }), 404
+
+    conn.execute(
         "DELETE FROM contacts WHERE id = ?",
         (contact_id,)
     )
 
     conn.commit()
     conn.close()
-
-    if cursor.rowcount == 0:
-        return jsonify({
-            "success": False,
-            "message": "Contact not found."
-        }), 404
 
     return jsonify({
         "success": True,
@@ -138,8 +160,15 @@ def save_history():
 
     data = request.get_json() or {}
 
-    event = data.get("event", "SOS Activated")
-    location = data.get("location", "")
+    event = data.get(
+        "event",
+        "SOS Activated"
+    )
+
+    location = data.get(
+        "location",
+        ""
+    )
 
     conn = get_db()
 
@@ -208,6 +237,7 @@ def delete_history(history_id):
     conn.close()
 
     if cursor.rowcount == 0:
+
         return jsonify({
             "success": False,
             "message": "History record not found."
@@ -220,7 +250,7 @@ def delete_history(history_id):
 
 
 # =========================
-# INITIALIZE DATABASE
+# START APPLICATION
 # =========================
 
 init_db()

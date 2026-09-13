@@ -1,112 +1,710 @@
-function loadContacts() {
-fetch("/contacts")
-.then(response => response.json())
-.then(contacts => {
+<!DOCTYPE html>
+<html lang="en">
 
-const list = document.getElementById("contactsList");
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-if (!list) {
-console.error("contactsList not found");
-return;
-}
+    <title>Smart Emergency SOS</title>
 
-list.innerHTML = "";
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-if (contacts.length === 0) {
-list.innerHTML =
-"<p style='color:#6b7280;'>No emergency contacts added yet.</p>";
-return;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
 
-contacts.forEach(contact => {
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
 
-const contactBox = document.createElement("div");
-contactBox.className = "contact-box";
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
 
-contactBox.innerHTML = `
-<div style="
+        h1 {
+            text-align: center;
+            color: #dc2626;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .sos-button {
+            display: block;
+            width: 180px;
+            height: 180px;
+            margin: 25px auto;
+            border-radius: 50%;
+            border: none;
+            background: #dc2626;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.35);
+        }
+
+        .sos-button:hover {
+            background: #b91c1c;
+        }
+
+        .cancel-button {
+            display: block;
+            margin: 10px auto;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: #6b7280;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .countdown {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #dc2626;
+            min-height: 35px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 7px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .add-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .contact-box {
+            padding: 15px;
+            margin-top: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f9fafb;
+        }
+
+        .call-button {
+            display: inline-block;
+            padding: 9px 15px;
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .delete-button {
+            padding: 9px 15px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .history-item {
+            padding: 12px;
+            margin-top: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .history-delete {
+            margin-top: 8px;
+            padding: 7px 12px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+            <h1>🚨 Smart Emergency SOS</h1>
+
+            <div id="countdown" class="countdown"></div>
+
+            <button class="sos-button" onclick="startSOS()">
+                SOS
+            </button>
+
+            <button class="cancel-button" onclick="cancelSOS()">
+                Cancel SOS
+            </button>
+
+            <p id="sosMessage" class="message"></p>
+        </div>
+
+
+        <!-- CONTACTS -->
+
+        <div class="card">
+
+            <h2>📞 Emergency Contacts</h2>
+
+            <input type="text" id="contactName" placeholder="Enter contact name">
+
+            <input type="tel" id="contactPhone" placeholder="Enter phone number">
+
+            <button class="add-button" onclick="addContact()">
+                ➕ Add Emergency Contact
+            </button>
+
+            <p id="contactMessage" class="message"></p>
+
+            <div id="contactsList"></div>
+
+        </div>
+
+
+        <!-- HISTORY -->
+
+        <div class="card">
+
+            <h2>📋 Emergency History</h2>
+
+            <div id="historyList">
+                <p style="color:#6b7280;">
+                    No emergency history yet.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        let countdownTimer = null;
+        let countdownValue = 5;
+
+
+        /* =========================
+           SOS
+        ========================= */
+
+        function startSOS() {
+
+            if (countdownTimer) {
+                return;
+            }
+
+            countdownValue = 5;
+
+            const countdown =
+                document.getElementById("countdown");
+
+            const message =
+                document.getElementById("sosMessage");
+
+            message.innerText =
+                "SOS will activate soon...";
+
+            countdown.innerText =
+                "Activating in " + countdownValue;
+
+            countdownTimer = setInterval(function () {
+
+                countdownValue--;
+
+                if (countdownValue <= 0) {
+
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+
+                    countdown.innerText = "🚨 SOS ACTIVATED";
+
+                    message.innerText =
+                        "Emergency alert activated.";
+
+                    saveHistory(
+                        "SOS Activated",
+                        "Location unavailable"
+                    );
+
+                    return;
+                }
+
+                countdown.innerText =
+                    "Activating in " + countdownValue;
+
+            }, 1000);
+        }
+
+
+        /* =========================
+           CANCEL SOS
+        ========================= */
+
+        function cancelSOS() {
+
+            if (countdownTimer) {
+
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+
+            document.getElementById("countdown").innerText = "";
+
+            document.getElementById("sosMessage").innerText =
+                "SOS cancelled.";
+        }
+
+
+        /* =========================
+           ADD CONTACT
+        ========================= */
+
+        function addContact() {
+
+            const name =
+                document.getElementById("contactName").value.trim();
+
+            const phone =
+                document.getElementById("contactPhone").value.trim();
+
+            const message =
+                document.getElementById("contactMessage");
+
+            if (!name || !phone) {
+
+                message.innerText =
+                    "Please enter name and phone number.";
+
+                return;
+            }
+
+            fetch("/add_contact", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    name: name,
+                    phone: phone
+                })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    message.innerText = data.message;
+
+                    if (data.success) {
+
+                        document.getElementById("contactName").value = "";
+                        document.getElementById("contactPhone").value = "";
+
+                        loadContacts();
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.error(error);
+
+                    message.innerText =
+                        "Unable to save contact.";
+                });
+        }
+
+
+        /* =========================
+           LOAD CONTACTS
+        ========================= */
+
+        function loadContacts() {
+
+            fetch("/contacts")
+
+                .then(response => response.json())
+
+                .then(contacts => {
+
+                    const list =
+                        document.getElementById("contactsList");
+
+                    list.innerHTML = "";
+
+                    if (contacts.length === 0) {
+
+                        list.innerHTML =
+                            "<p style='color:#6b7280;'>No emergency contacts added yet.</p>";
+
+                        return;
+                    }
+
+                    contacts.forEach(contact => {
+
+                        const contactBox =
+                            document.createElement("div");
+
+                        contactBox.className =
+                            "contact-box";
+
+                        contactBox.innerHTML = `
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    flex-wrap:wrap;
+                ">
+
+                    <div>
+
+                        <strong>
+                            👤 ${contact.name}
+                        </strong>
+
+                        <br>
+
+                        📞 ${contact.phone}
+
+                    </div>
+
+                    <div style="
                         display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        gap:15px;
+                        gap:8px;
                         flex-wrap:wrap;
                     ">
 
-    <div>
-        <strong>👤 ${contact.name}</strong>
-        <br>
-        📞 ${contact.phone}
-    </div>
+                        <a
+                            href="tel:${contact.phone}"
+                            class="call-button"
+                        >
+                            📱 Call
+                        </a>
 
-    <div style="
-                            display:flex;
-                            gap:8px;
-                            flex-wrap:wrap;
-                        ">
+                        <button
+                            type="button"
+                            class="delete-button"
+                            onclick="deleteContact(${contact.id})"
+                        >
+                            🗑️ Delete
+                        </button>
 
-        <a href="tel:${contact.phone}" class="call-button">
-            📱 Call
-        </a>
+                    </div>
 
-        <button type="button" onclick="deleteContact(${contact.id})" style="
-                                    padding:9px 15px;
-                                    background:#dc2626;
-                                    color:white;
-                                    border:none;
-                                    border-radius:8px;
-                                    cursor:pointer;
-                                    font-weight:bold;
-                                ">
-            🗑️ Delete
-        </button>
+                </div>
 
-    </div>
-</div>
-`;
+            `;
 
-list.appendChild(contactBox);
-});
-})
-.catch(error => {
-console.error("Contact loading error:", error);
-});
-}
+                        list.appendChild(contactBox);
+                    });
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Contact loading error:",
+                        error
+                    );
+
+                });
+        }
 
 
-function deleteContact(id) {
+        /* =========================
+           DELETE CONTACT
+        ========================= */
 
-const confirmed = confirm(
-"Are you sure you want to delete this emergency contact?"
-);
+        function deleteContact(id) {
 
-if (!confirmed) {
-return;
-}
+            const confirmed = confirm(
+                "Are you sure you want to delete this emergency contact?"
+            );
 
-fetch(`/delete_contact/${id}`, {
-method: "DELETE"
-})
-.then(response => response.json())
-.then(data => {
+            if (!confirmed) {
+                return;
+            }
 
-if (data.success) {
+            fetch(`/delete_contact/${id}`, {
 
-alert("Contact deleted successfully! 🗑️");
+                method: "DELETE"
 
-loadContacts();
+            })
 
-} else {
+                .then(response => response.json())
 
-alert(
-data.message || "Unable to delete contact."
-);
-}
+                .then(data => {
 
-})
-.catch(error => {
+                    if (data.success) {
 
-console.error("Delete error:", error);
+                        alert(
+                            "Contact deleted successfully! 🗑️"
+                        );
 
-alert("Unable to delete contact.");
-});
-}
+                        loadContacts();
+
+                    } else {
+
+                        alert(
+                            data.message ||
+                            "Unable to delete contact."
+                        );
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Delete error:",
+                        error
+                    );
+
+                    alert(
+                        "Unable to delete contact."
+                    );
+
+                });
+        }
+
+
+        /* =========================
+           SAVE HISTORY
+        ========================= */
+
+        function saveHistory(event, location) {
+
+            fetch("/save_history", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    event: event,
+                    location: location
+                })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    console.log(
+                        "History:",
+                        data.message
+                    );
+
+                    loadHistory();
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "History error:",
+                        error
+                    );
+
+                });
+        }
+
+
+        /* =========================
+           LOAD HISTORY
+        ========================= */
+
+        function loadHistory() {
+
+            fetch("/history")
+
+                .then(response => response.json())
+
+                .then(records => {
+
+                    const list =
+                        document.getElementById("historyList");
+
+                    list.innerHTML = "";
+
+                    if (records.length === 0) {
+
+                        list.innerHTML =
+                            "<p style='color:#6b7280;'>No emergency history yet.</p>";
+
+                        return;
+                    }
+
+                    records.forEach(record => {
+
+                        const item =
+                            document.createElement("div");
+
+                        item.className =
+                            "history-item";
+
+                        item.innerHTML = `
+
+                <strong>
+                    🚨 ${record.event}
+                </strong>
+
+                <br>
+
+                📍 ${record.location || "Location unavailable"}
+
+                <br>
+
+                🕒 ${record.created_at}
+
+                <br>
+
+                <button
+                    class="history-delete"
+                    onclick="deleteHistory(${record.id})"
+                >
+                    🗑️ Delete
+                </button>
+
+            `;
+
+                        list.appendChild(item);
+
+                    });
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "History loading error:",
+                        error
+                    );
+
+                });
+        }
+
+
+        /* =========================
+           DELETE HISTORY
+        ========================= */
+
+        function deleteHistory(id) {
+
+            if (!confirm(
+                "Delete this emergency history?"
+            )) {
+                return;
+            }
+
+            fetch(`/delete_history/${id}`, {
+
+                method: "DELETE"
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    if (data.success) {
+
+                        alert(
+                            "History deleted successfully!"
+                        );
+
+                        loadHistory();
+
+                    } else {
+
+                        alert(
+                            data.message ||
+                            "Unable to delete history."
+                        );
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "History delete error:",
+                        error
+                    );
+
+                    alert(
+                        "Unable to delete history."
+                    );
+
+                });
+        }
+
+
+        /* =========================
+           PAGE LOAD
+        ========================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                loadContacts();
+                loadHistory();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
